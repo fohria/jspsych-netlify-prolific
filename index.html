@@ -7,7 +7,6 @@
     <link href="css/jspsych.css" rel="stylesheet" type="text/css"></link>
     <script src="plugins/jspsych-html-keyboard-response.js"></script>
     <script src="plugins/jspsych-image-keyboard-response.js"></script>
-    <script src="jquery.js"></script>
     <script src="experiment.js"></script>
 </head>
 
@@ -23,10 +22,16 @@
 
         // get experiment data and send it to netlify
         let csvdata = jsPsych.data.get().csv();
-        $("#sneakyjson").val(csvdata);
-        let $form = $("#dataform");
-        $.post($form.attr("action"), $form.serialize()).then(function() {
-            console.log("sent exp data to netlify with jquery!");
+        let sneakyJSON = document.querySelector("#sneakyjson");
+        sneakyJSON.textContent = csvdata;
+        let form = document.querySelector("#dataform");
+        fetch(
+            form.getAttribute("action"),
+            { method: "post", body: new FormData(form) }
+        ).then(function(res) {
+            if (res.ok) {
+                console.log("sent exp data to netlify!");
+            }
         });
 
         // add link back to prolific (remember to change to your code!)

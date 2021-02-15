@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>example of netlify-prolific plugin for jspsych</title>
+    <script src="jspsych.js"></script>
+    <link href="css/jspsych.css" rel="stylesheet" type="text/css"></link>
+    <script src="plugins/jspsych-html-keyboard-response.js"></script>
+    <script src="plugins/jspsych-image-keyboard-response.js"></script>
+    <script src="jquery.js"></script>
+    <script src="experiment.js"></script>
+</head>
+
+<body>
+
+    <script>
+    function subbit() {
+        // add prolific id to jspsych data
+        let subject_id = jsPsych.data.getURLVariable('PROLIFIC_PID');
+        jsPsych.data.addProperties({
+            subject_id: subject_id
+        });
+
+        // get experiment data and send it to netlify
+        let csvdata = jsPsych.data.get().csv();
+        $("#sneakyjson").val(csvdata);
+        let $form = $("#dataform");
+        $.post($form.attr("action"), $form.serialize()).then(function() {
+            console.log("sent exp data to netlify with jquery!");
+        });
+
+        // add link back to prolific (remember to change to your code!)
+        html = "<p>Thanks for your participation!</p><p><a href='https://app.prolific.co/submissions/complete?cc=YOURCODEHERE'>Please click here to return to Prolific</a></p>";
+        let content_element = document.getElementById('jspsych-content');
+        content_element.innerHTML = html;
+    }
+    </script>
+
+    <!-- hidden form used to send data to netlify -->
+    <form id="dataform" name="submission-data" method="POST" data-netlify="true" hidden>
+        <textarea name="jspsych-data" id="sneakyjson">this text will automatically be replaced with your data</textarea></label>
+        <button type="submit">Send</button>
+    </form>
+
+</body>
+
+</html>
